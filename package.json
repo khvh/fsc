@@ -1,0 +1,48 @@
+{
+  "name": "@khv/fsc",
+  "version": "1.0.0",
+  "main": "dist/fsc.js",
+  "module": "dist/fsc.mjs",
+  "typings": "dist/fsc.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--enable-source-maps cross-env CONFIG=./config.yml nodemon",
+    "start": "ts-node src/index.ts",
+    "build": "rollup -c"
+  },
+  "devDependencies": {
+    "@types/node": "^16.6.2",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.12.22",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2",
+    "rollup": "^2.56.2",
+    "rollup-plugin-dts": "^3.0.2",
+    "rollup-plugin-esbuild": "^4.5.0",
+    "ts-eager": "^2.0.2",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@mikro-orm/core": "^4.5.7",
+    "@mikro-orm/mongodb": "^4.5.7",
+    "@mikro-orm/reflection": "^4.5.7",
+    "class-transformer": "^0.4.0",
+    "fastify": "^3.20.2",
+    "typedi": "^0.10.0"
+  },
+  "peerDependencies": {
+    "@mikro-orm/core": "^4.5.7",
+    "@mikro-orm/mongodb": "^4.5.7",
+    "@mikro-orm/reflection": "^4.5.7",
+    "class-transformer": "^0.4.0",
+    "fastify": "^3.20.2",
+    "typedi": "^0.10.0"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 120,
+    "trailingComma": "none",
+    "semi": true
+  }
+}
