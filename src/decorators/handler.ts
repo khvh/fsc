@@ -1,54 +1,26 @@
-export function Get(path: string): MethodDecorator {
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
-    (target['methods'] = target['methods'] || {})[propertyKey] = {
-      path,
-      method: 'GET',
-      func: descriptor.value
-    };
-    return descriptor;
-  };
-}
+import { HttpMethod } from './entities';
 
-export function Post(path: string): MethodDecorator {
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
+const handler = (path = '', method: HttpMethod) => {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     (target['methods'] = target['methods'] || {})[propertyKey] = {
       path,
-      method: 'POST',
+      method,
       func: descriptor.value
     };
     return descriptor;
   };
-}
+};
 
-export function Put(path: string): MethodDecorator {
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
-    (target['methods'] = target['methods'] || {})[propertyKey] = {
-      path,
-      method: 'PUT',
-      func: descriptor.value
-    };
-    return descriptor;
-  };
-}
+export const Get = (path = '') => handler(path, HttpMethod.Get);
 
-export function Patch(path: string): MethodDecorator {
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
-    (target['methods'] = target['methods'] || {})[propertyKey] = {
-      path,
-      method: 'PATCH',
-      func: descriptor.value
-    };
-    return descriptor;
-  };
-}
+export const Post = (path = '') => handler(path, HttpMethod.Post);
 
-export function Delete(path: string): MethodDecorator {
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
-    (target['methods'] = target['methods'] || {})[propertyKey] = {
-      path,
-      method: 'DELETE',
-      func: descriptor.value
-    };
-    return descriptor;
-  };
-}
+export const Put = (path = '') => handler(path, HttpMethod.Put);
+
+export const Patch = (path = '') => handler(path, HttpMethod.Patch);
+
+export const Delete = (path = '') => handler(path, HttpMethod.Delete);
+
+export const Options = (path = '') => handler(path, HttpMethod.Options);
+
+export const Head = (path = '') => handler(path, HttpMethod.Head);

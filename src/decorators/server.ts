@@ -1,55 +1,58 @@
+import { MikroORM } from '@mikro-orm/core';
 import fastify, { FastifyInstance } from 'fastify';
-import { readdir } from 'fs/promises';
+import { readdirSync } from 'fs';
 import { join } from 'path';
-import { useContainer } from '../container';
+import Container, { Service } from 'typedi';
+
+export interface DB {}
 
 export interface ServerOptions {
   port: number;
-  controllers: string;
-  orm?: () => void;
+  controllers?: string;
+  dbConfig: any;
 }
 
 export class FastifyServer {
   app!: FastifyInstance;
+}
 
-  constructor(
-    public opts: ServerOptions = {
-      port: 1337,
-      controllers: null
-    }
-  ) {
-    this.app = fastify({
-      logger: true
-    });
+@Service()
+export class Application {
+  opts: ServerOptions;
+  server: FastifyInstance;
 
-    useContainer().set('app', this.app);
-
-    this.load();
+  constructor() {
+    this.server = fastify({ logger: true });
   }
 
-  run() {
-    this.app.listen(this.opts.port);
+  async init(opts: ServerOptions) {
+    this.opts = opts;
+
+    this.load(opts.controllers);
+
+    const orm = await MikroORM.init(opts.dbConfig);
+
+    Container.set('em', orm.em);
+
+    this.server
+      .decorate('em', orm.em)
+      .decorateRequest('em', null)
+      .addHook('onRequest', async (req: any, reply) => {
+        req.em = orm.em;
+      });
+
+    return this;
   }
 
-  private load() {
-    Promise.all([this.loadOrm(), this.loadControllers()]).then(() => {
-      this.run();
-    });
+  load(str) {
+    readdirSync(str)
+      .filter((p) => p.endsWith('.ts'))
+      .forEach((controller) => require(join(str, controller)));
+
+    return this;
   }
 
-  private async loadOrm() {
-    if (this.opts.orm) {
-      return await this.opts.orm();
-    }
-
-    return Promise.resolve(null);
-  }
-
-  private async loadControllers() {
-    return readdir(this.opts.controllers).then((files) => {
-      files.filter((p) => p.endsWith('.ts')).forEach((controller) => require(join(this.opts.controllers, controller)));
-
-      return true;
-    });
+  start() {
+    this.server.listen(this.opts.port);
   }
 }

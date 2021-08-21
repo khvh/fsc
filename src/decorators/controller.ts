@@ -1,25 +1,25 @@
-import { FastifyInstance } from 'fastify';
-import { useContainer } from '../container';
-import { Methods } from './entities';
+import Container from 'typedi';
+import { HttpMethod } from './entities';
+import { Application } from './server';
 
-export function Controller(pathPrefix: string): ClassDecorator {
-  return function (constructor: Function) {
-    Object.entries(constructor.prototype['methods']).forEach(([_key, route]) => {
+export function Controller(prefix = '/') {
+  return function <T extends { new (...args: any[]): {} }>(Base: T) {
+    Object.entries(Base.prototype['methods']).forEach(([_key, route]) => {
       const {
         func,
         method,
         path
       }: {
         func: Function;
-        method: Methods;
+        method: HttpMethod;
         path: string;
       } = <any>route;
-      const url = ((pathPrefix || '') + path.replace(/\/$/, '')).replace('//', '/');
+      const url = ((prefix || '') + path.replace(/\/$/, '')).replace('//', '/');
 
-      (useContainer().get('app') as FastifyInstance).route({
+      Container.get(Application).server.route({
         method,
         url,
-        handler: async (req, rep) => func(req, rep)
+        handler: async (req, rep) => Container.get(Base)[func.name](req, rep)
       });
     });
   };
