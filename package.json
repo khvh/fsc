@@ -5,6 +5,7 @@
   "module": "dist/fsc.mjs",
   "typings": "dist/fsc.d.ts",
   "license": "MIT",
+  "repository": "git@github.com:khvh/fsc.git",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--enable-source-maps cross-env CONFIG=./config.yml nodemon",
     "start": "ts-node src/index.ts",
