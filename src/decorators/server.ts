@@ -52,6 +52,8 @@ export class Application {
         });
     }
 
+    Container.set('logger', this.server.log);
+
     return this;
   }
 
