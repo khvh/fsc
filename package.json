@@ -1,6 +1,6 @@
 {
   "name": "@khv/fsc",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/fsc.js",
   "module": "dist/fsc.mjs",
   "typings": "dist/fsc.d.ts",
