@@ -1,7 +1,5 @@
 import { MikroORM } from '@mikro-orm/core';
 import fastify, { FastifyInstance } from 'fastify';
-import { readdirSync } from 'fs';
-import { join } from 'path';
 import readdirp from 'readdirp';
 import Container, { Service } from 'typedi';
 import { Context } from './controller';
@@ -59,10 +57,6 @@ export class Application {
 
   async load(str) {
     (await readdirp.promise(str, { fileFilter: '*.*s' })).forEach((controller) => require(controller.fullPath));
-
-    readdirSync(str)
-      .filter((p) => p.endsWith('.ts'))
-      .forEach((controller) => require(join(str, controller)));
 
     return this;
   }

@@ -1,3 +1,4 @@
+import { EntityManager } from '@mikro-orm/mongodb';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import Container from 'typedi';
 import { HttpMethod } from './entities';
@@ -6,6 +7,7 @@ import { Application } from './server';
 export interface Context<U = any, B = any, Q = any, P = any> {
   req: FastifyRequest;
   res: FastifyReply;
+  em?: EntityManager;
   authorization?: string;
   currentUser?: U;
   body?: B;
@@ -44,6 +46,7 @@ export function Controller(prefix = '/', description?: ControllerDescription) {
           const ctx: Context = {
             req,
             res,
+            em: (req as any)?.em as EntityManager,
             authorization: req.headers?.authorization?.replace('Bearer ', ''),
             body: req.body,
             query: req.query,
