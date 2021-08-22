@@ -13,8 +13,17 @@ export interface Context<U = any, B = any, Q = any, P = any> {
   params?: P;
 }
 
-export function Controller(prefix = '/') {
+export interface ControllerDescription {
+  title?: string;
+  description?: string;
+}
+
+export function Controller(prefix = '/', description?: ControllerDescription) {
   return function <T extends { new (...args: any[]): {} }>(Base: T) {
+    if (!Base.prototype.methods) {
+      return;
+    }
+
     Object.entries(Base.prototype['methods']).forEach(([_key, route]) => {
       const {
         func,

@@ -1,5 +1,10 @@
 import { HttpMethod } from './entities';
 
+export interface HandlerDescription {
+  title?: string;
+  description?: string;
+}
+
 const handler = (path = '', method: HttpMethod) => {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     (target['methods'] = target['methods'] || {})[propertyKey] = {
@@ -11,16 +16,16 @@ const handler = (path = '', method: HttpMethod) => {
   };
 };
 
-export const Get = (path = '') => handler(path, HttpMethod.Get);
+export const Get = (path = '', description?: HandlerDescription) => handler(path, HttpMethod.Get);
 
-export const Post = (path = '') => handler(path, HttpMethod.Post);
+export const Post = (path = '', description?: HandlerDescription) => handler(path, HttpMethod.Post);
 
-export const Put = (path = '') => handler(path, HttpMethod.Put);
+export const Put = (path = '', description?: HandlerDescription) => handler(path, HttpMethod.Put);
 
-export const Patch = (path = '') => handler(path, HttpMethod.Patch);
+export const Patch = (path = '', description?: HandlerDescription) => handler(path, HttpMethod.Patch);
 
-export const Delete = (path = '') => handler(path, HttpMethod.Delete);
+export const Delete = (path = '', description?: HandlerDescription) => handler(path, HttpMethod.Delete);
 
-export const Options = (path = '') => handler(path, HttpMethod.Options);
+export const Options = (path = '', description?: HandlerDescription) => handler(path, HttpMethod.Options);
 
-export const Head = (path = '') => handler(path, HttpMethod.Head);
+export const Head = (path = '', description?: HandlerDescription) => handler(path, HttpMethod.Head);
