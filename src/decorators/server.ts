@@ -3,13 +3,16 @@ import fastify, { FastifyInstance } from 'fastify';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import Container, { Service } from 'typedi';
+import { Context } from './controller';
 
 export interface DB {}
 
 export interface ServerOptions {
   port: number;
   controllers?: string;
-  dbConfig: any;
+  dbConfig?: any;
+  currentUser?: (context: Context) => void;
+  authorize?: (context: Context) => void;
 }
 
 export class FastifyServer {
@@ -20,6 +23,8 @@ export class FastifyServer {
 export class Application {
   opts: ServerOptions;
   server: FastifyInstance;
+  currentUser?: (context: Context) => void;
+  authorize?: (context: Context) => void;
 
   constructor() {
     this.server = fastify({ logger: true });
@@ -30,16 +35,21 @@ export class Application {
 
     this.load(opts.controllers);
 
-    const orm = await MikroORM.init(opts.dbConfig);
+    this.currentUser = opts.currentUser || null;
+    this.authorize = opts.authorize || null;
 
-    Container.set('em', orm.em);
+    if (opts.dbConfig) {
+      const orm = await MikroORM.init(opts.dbConfig);
 
-    this.server
-      .decorate('em', orm.em)
-      .decorateRequest('em', null)
-      .addHook('onRequest', async (req: any, reply) => {
-        req.em = orm.em;
-      });
+      Container.set('em', orm.em);
+
+      this.server
+        .decorate('em', orm.em)
+        .decorateRequest('em', null)
+        .addHook('onRequest', async (req: any, reply) => {
+          req.em = orm.em;
+        });
+    }
 
     return this;
   }
