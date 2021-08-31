@@ -29,11 +29,16 @@
     "@mikro-orm/core": "^4.5.7",
     "@mikro-orm/mongodb": "^4.5.7",
     "@mikro-orm/reflection": "^4.5.7",
+    "@types/ws": "^7.4.7",
     "class-transformer": "^0.4.0",
     "fastify": "^3.20.2",
+    "got": "^11.8.2",
+    "kraken-api": "^1.0.1",
+    "qs": "^6.10.1",
     "readdirp": "^3.6.0",
     "reflect-metadata": "^0.1.13",
-    "typedi": "^0.10.0"
+    "typedi": "^0.10.0",
+    "ws": "^8.2.1"
   },
   "peerDependencies": {
     "@mikro-orm/core": "^4.5.7",
@@ -41,8 +46,8 @@
     "@mikro-orm/reflection": "^4.5.7",
     "class-transformer": "^0.4.0",
     "fastify": "^3.20.2",
-    "typedi": "^0.10.0",
-    "readdirp": "^3.6.0"
+    "readdirp": "^3.6.0",
+    "typedi": "^0.10.0"
   },
   "prettier": {
     "singleQuote": true,

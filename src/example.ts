@@ -1,10 +1,25 @@
+import crypto from 'crypto';
 import { join } from 'path';
+import qs from 'qs';
 import 'reflect-metadata';
 import Container from 'typedi';
 import { Context } from './decorators/controller';
 import { Application } from './decorators/server';
 
-(async () =>
+let i = 0;
+
+const getMessageSignature = (path, request, secret, nonce) => {
+  const message = qs.stringify(request);
+  const secret_buffer = Buffer.from(secret, 'base64');
+  const hash = crypto.createHash('sha256');
+  const hmac = crypto.createHmac('sha512', secret_buffer);
+  const hash_digest = hash.update(nonce + message).digest();
+  const hmac_digest = hmac.update(path + hash_digest, 'binary').digest('base64');
+
+  return hmac_digest;
+};
+
+(async () => {
   (
     await Container.get(Application).init({
       port: 1338,
@@ -14,4 +29,5 @@ import { Application } from './decorators/server';
         email: 'test@example.org'
       })
     })
-  ).start())();
+  ).start();
+})();
