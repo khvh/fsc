@@ -1,5 +1,6 @@
-import { MikroORM } from '@mikro-orm/core';
 import fastify, { FastifyInstance } from 'fastify';
+import Knex from 'knex';
+import { Model } from 'objection';
 import readdirp from 'readdirp';
 import Container, { Service } from 'typedi';
 import { Context } from './controller';
@@ -38,16 +39,9 @@ export class Application {
     this.authorize = opts.authorize || null;
 
     if (opts.dbConfig) {
-      const orm = await MikroORM.init(opts.dbConfig);
+      const knex = Knex(opts.dbConfig);
 
-      Container.set('em', orm.em);
-
-      this.server
-        .decorate('em', orm.em)
-        .decorateRequest('em', null)
-        .addHook('onRequest', async (req: any, reply) => {
-          req.em = orm.em;
-        });
+      Model.knex(knex);
     }
 
     Container.set('logger', this.server.log);

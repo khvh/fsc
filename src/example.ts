@@ -3,6 +3,7 @@ import { join } from 'path';
 import qs from 'qs';
 import 'reflect-metadata';
 import Container from 'typedi';
+import config from '../knexfile';
 import { Context } from './decorators/controller';
 import { Application } from './decorators/server';
 
@@ -27,7 +28,8 @@ const getMessageSignature = (path, request, secret, nonce) => {
       currentUser: (ctx: Context) => ({
         first: 'Test User',
         email: 'test@example.org'
-      })
+      }),
+      dbConfig: config
     })
   ).start();
 })();

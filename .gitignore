@@ -1,3 +1,6 @@
 node_modules/
 dist/
 mikro-orm.config.ts
+knexfile.ts
+.env
+yarn-error.log

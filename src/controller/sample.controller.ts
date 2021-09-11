@@ -12,7 +12,8 @@ export class SampleController {
 
   @Get('/')
   async someMethod(rep, res) {
-    return { s: this.s.test() };
+    const s = await this.s.testMembers();
+    return { s };
   }
 
   @Post('/kek')
