@@ -29,6 +29,12 @@ const getMessageSignature = (path, request, secret, nonce) => {
         first: 'Test User',
         email: 'test@example.org'
       }),
+      verifyUserToken: (token) => {
+        return Promise.resolve(token === 'TOKEN');
+      },
+      getUserRoles: () => {
+        return Promise.resolve(['admin', 'lmao']);
+      },
       dbConfig: config
     })
   ).start();

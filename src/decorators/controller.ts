@@ -1,6 +1,9 @@
 import { EntityManager } from '@mikro-orm/mongodb';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { intersection } from 'lodash';
 import Container from 'typedi';
+import { ForbiddenError } from '../error/forbidden.error';
+import { UnauthorizedError } from '../error/unauthorized.error';
 import { HttpMethod } from './entities';
 import { Application } from './server';
 
@@ -30,11 +33,15 @@ export function Controller(prefix = '/', description?: ControllerDescription) {
       const {
         func,
         method,
-        path
+        path,
+        checkAuth,
+        roles = []
       }: {
         func: Function;
         method: HttpMethod;
         path: string;
+        checkAuth?: boolean;
+        roles?: string[];
       } = <any>route;
       const url = ((prefix || '') + path.replace(/\/$/, '')).replace('//', '/');
       const app = Container.get(Application);
@@ -54,8 +61,32 @@ export function Controller(prefix = '/', description?: ControllerDescription) {
             currentUser: null
           };
 
+          if (checkAuth && !ctx.authorization) {
+            return null;
+          }
+
+          if (checkAuth && ctx.authorization) {
+            const authorized = await app.verifyUserToken(ctx.authorization);
+
+            if (!authorized) {
+              res.status(401);
+
+              throw new UnauthorizedError();
+            }
+          }
+
           if (app.currentUser) {
             ctx.currentUser = await app.currentUser(ctx);
+          }
+
+          if (roles.length > 0) {
+            const userRoles = await app.getUserRoles(ctx);
+
+            if (intersection(userRoles, roles).length === 0) {
+              res.status(403);
+
+              throw new ForbiddenError();
+            }
           }
 
           return Container.get(Base)[func.name](ctx);

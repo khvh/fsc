@@ -12,6 +12,7 @@ const handler = (path = '', method: HttpMethod) => {
       method,
       func: descriptor.value
     };
+
     return descriptor;
   };
 };

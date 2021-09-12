@@ -13,6 +13,8 @@ export interface ServerOptions {
   dbConfig?: any;
   currentUser?: (context: Context) => void;
   authorize?: (context: Context) => void;
+  verifyUserToken?: (token: string) => Promise<boolean>;
+  getUserRoles?: (context: Context) => Promise<string[]>;
 }
 
 export class FastifyServer {
@@ -25,6 +27,8 @@ export class Application {
   server: FastifyInstance;
   currentUser?: (context: Context) => void;
   authorize?: (context: Context) => void;
+  verifyUserToken?: (token: string) => Promise<boolean>;
+  getUserRoles?: (context: Context) => Promise<string[]>;
 
   constructor() {
     this.server = fastify({ logger: true });
@@ -37,6 +41,8 @@ export class Application {
 
     this.currentUser = opts.currentUser || null;
     this.authorize = opts.authorize || null;
+    this.verifyUserToken = opts.verifyUserToken || null;
+    this.getUserRoles = opts.getUserRoles || null;
 
     if (opts.dbConfig) {
       const knex = Knex(opts.dbConfig);
