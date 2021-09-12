@@ -2,7 +2,9 @@ export interface AuthorizedOptions {
   roles?: string[];
 }
 
-export const Authorized = ({ roles = [] }: AuthorizedOptions) => {
+export const Authorized = (opts: AuthorizedOptions = { roles: [] }) => {
+  const { roles } = opts;
+
   return (target, propertyKey, descriptor) => {
     if ((target['methods'] = target['methods'] || {})[propertyKey]) {
       (target['methods'] = target['methods'] || {})[propertyKey].checkAuth = true;
