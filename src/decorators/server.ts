@@ -62,6 +62,6 @@ export class Application {
   }
 
   start() {
-    this.server.listen(this.opts.port);
+    this.server.listen(this.opts.port, '0.0.0.0');
   }
 }
