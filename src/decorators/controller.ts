@@ -64,7 +64,7 @@ export function Controller(prefix = '/', description?: ControllerDescription) {
           };
 
           if (checkAuth) {
-            const authorized = await app.verifyUserToken(ctx.headers);
+            const authorized = await app.verifyUserToken(ctx);
 
             if (!authorized) {
               res.status(401);
