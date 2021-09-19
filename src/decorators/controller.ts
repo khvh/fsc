@@ -62,7 +62,9 @@ export function Controller(prefix = '/', description?: ControllerDescription) {
           };
 
           if (checkAuth && !ctx.authorization) {
-            return null;
+            res.status(401);
+
+            throw new UnauthorizedError();
           }
 
           if (checkAuth && ctx.authorization) {
