@@ -16,6 +16,7 @@ export interface Context<U = any, B = any, Q = any, P = any> {
   body?: B;
   query?: Q;
   params?: P;
+  headers?: any;
 }
 
 export interface ControllerDescription {
@@ -58,17 +59,12 @@ export function Controller(prefix = '/', description?: ControllerDescription) {
             body: req.body,
             query: req.query,
             params: req.params,
+            headers: req.headers,
             currentUser: null
           };
 
-          if (checkAuth && !ctx.authorization) {
-            res.status(401);
-
-            throw new UnauthorizedError();
-          }
-
-          if (checkAuth && ctx.authorization) {
-            const authorized = await app.verifyUserToken(ctx.authorization);
+          if (checkAuth) {
+            const authorized = await app.verifyUserToken(ctx.headers);
 
             if (!authorized) {
               res.status(401);

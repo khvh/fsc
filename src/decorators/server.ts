@@ -13,7 +13,7 @@ export interface ServerOptions {
   dbConfig?: any;
   currentUser?: (context: Context) => void;
   authorize?: (context: Context) => void;
-  verifyUserToken?: (token: string) => Promise<boolean>;
+  verifyUserToken?: (context: Context) => Promise<boolean>;
   getUserRoles?: (context: Context) => Promise<string[]>;
 }
 
@@ -27,7 +27,7 @@ export class Application {
   server: FastifyInstance;
   currentUser?: (context: Context) => void;
   authorize?: (context: Context) => void;
-  verifyUserToken?: (token: string) => Promise<boolean>;
+  verifyUserToken?: (context: Context) => Promise<boolean>;
   getUserRoles?: (context: Context) => Promise<string[]>;
 
   constructor() {

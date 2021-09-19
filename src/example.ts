@@ -29,8 +29,8 @@ const getMessageSignature = (path, request, secret, nonce) => {
         first: 'Test User',
         email: 'test@example.org'
       }),
-      verifyUserToken: (token) => {
-        return Promise.resolve(token === 'TOKEN');
+      verifyUserToken: (ctx: Context) => {
+        return Promise.resolve(ctx.authorization === 'TOKEN');
       },
       getUserRoles: () => {
         return Promise.resolve(['admin', 'lmao']);
