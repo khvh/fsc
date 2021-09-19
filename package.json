@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--enable-source-maps cross-env CONFIG=./config.yml nodemon",
     "start": "ts-node src/index.ts",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "patchpub": "yarn build ; npm version patch ; npm publish"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^4.5.7",
