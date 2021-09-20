@@ -13,7 +13,6 @@
     "patchpub": "yarn build ; npm version patch ; npm publish"
   },
   "devDependencies": {
-    "@mikro-orm/cli": "^4.5.7",
     "@types/knex": "^0.16.1",
     "@types/lodash": "^4.14.172",
     "@types/node": "^16.6.2",
@@ -29,18 +28,14 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@mikro-orm/core": "^4.5.7",
-    "@mikro-orm/mongodb": "^4.5.7",
-    "@mikro-orm/reflection": "^4.5.7",
     "@types/ws": "^7.4.7",
     "class-transformer": "^0.4.0",
     "dotenv": "^10.0.0",
     "fastify": "^3.20.2",
     "got": "^11.8.2",
     "knex": "^0.95.11",
-    "kraken-api": "^1.0.1",
     "lodash": "^4.17.21",
-    "objection": "^2.2.15",
+    "objection": "^2.2.16",
     "pg": "^8.7.1",
     "qs": "^6.10.1",
     "readdirp": "^3.6.0",
@@ -52,8 +47,9 @@
     "class-transformer": "^0.4.0",
     "fastify": "^3.20.2",
     "knex": "^0.95.11",
-    "objection": "^2.2.15",
+    "objection": "^2.2.16",
     "readdirp": "^3.6.0",
+    "reflect-metadata": "^0.1.13",
     "typedi": "^0.10.0"
   },
   "prettier": {

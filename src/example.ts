@@ -1,55 +1,38 @@
-import crypto from 'crypto';
-import fastify from 'fastify';
-import { join } from 'path';
-import qs from 'qs';
+import Knex from 'knex';
+import { Model } from 'objection';
 import 'reflect-metadata';
 import Container from 'typedi';
-import config from '../knexfile';
-import { MetadataController } from './controller/metadata.controller';
-import { Context, register } from './decorators/controller';
-import { Application } from './decorators/server';
+import dbConfig from '../knexfile';
+import { AuthUtils, Context } from './decorators/entities';
+import { Server } from './decorators/server';
 
-let i = 0;
+class V implements AuthUtils<{ first: string; email: string }> {
+  verifyUserToken(ctx: Context): Promise<boolean> {
+    return Promise.resolve(true);
+  }
 
-const getMessageSignature = (path, request, secret, nonce) => {
-  const message = qs.stringify(request);
-  const secret_buffer = Buffer.from(secret, 'base64');
-  const hash = crypto.createHash('sha256');
-  const hmac = crypto.createHmac('sha512', secret_buffer);
-  const hash_digest = hash.update(nonce + message).digest();
-  const hmac_digest = hmac.update(path + hash_digest, 'binary').digest('base64');
+  currentUser(ctx: Context) {
+    return Promise.resolve({
+      first: 'Test User',
+      email: 'user@eample.org'
+    });
+  }
 
-  return hmac_digest;
-};
+  getUserRoles(ctx: Context) {
+    return Promise.resolve([]);
+  }
+}
 
-const r = async () => {
-  (
-    await Container.get(Application).init({
-      port: 1338,
-      controllers: join(__dirname, 'controller'),
-      currentUser: (ctx: Context) => ({
-        first: 'Test User',
-        email: 'test@example.org'
-      }),
-      verifyUserToken: (ctx: Context) => {
-        return Promise.resolve(ctx.authorization === 'TOKEN');
-      },
-      getUserRoles: () => {
-        return Promise.resolve(['admin', 'lmao']);
-      },
-      dbConfig: config
+Container.set('auth:utils', V);
+
+new Server()
+  .load(
+    new Promise<any>(async (r) => {
+      const knex = Knex(dbConfig);
+
+      Model.knex(knex);
+
+      r(true);
     })
-  ).start();
-};
-
-r();
-
-const run = async () => {
-  const app = fastify({ logger: true });
-
-  register(app, [MetadataController]);
-
-  app.listen(1338, () => {});
-};
-
-// run();
+  )
+  .run();

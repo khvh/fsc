@@ -1,4 +1,4 @@
-import { RouteOptions } from 'fastify';
+import { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
 
 export enum HttpMethod {
   Get = 'GET',
@@ -23,7 +23,20 @@ export interface Meta {
   prefix: string;
   routes: { [key: string]: RouteMetadata };
 }
-// {
-//   prefix: '',
-//   methods: {}
-// }
+
+export interface Context<U = any, B = any, Q = any, P = any> {
+  req: FastifyRequest;
+  res: FastifyReply;
+  authorization?: string;
+  currentUser?: U;
+  body?: B;
+  query?: Q;
+  params?: P;
+  headers?: any;
+}
+
+export interface AuthUtils<U extends unknown = {}> {
+  verifyUserToken(ctx: Context): Promise<boolean>;
+  currentUser(ctx: Context): Promise<U>;
+  getUserRoles(ctx: Context): Promise<string[]>;
+}
