@@ -1,16 +1,14 @@
+import { setHandlerMeta } from './meta';
+
 export interface AuthorizedOptions {
   roles?: string[];
 }
 
-export const Authorized = (opts: AuthorizedOptions = { roles: [] }) => {
-  const { roles } = opts;
-
-  return (target, propertyKey, descriptor) => {
-    if ((target['methods'] = target['methods'] || {})[propertyKey]) {
-      (target['methods'] = target['methods'] || {})[propertyKey].checkAuth = true;
-      (target['methods'] = target['methods'] || {})[propertyKey].roles = roles;
-    }
-
-    return descriptor;
+export const Authorize = (opts: AuthorizedOptions = { roles: [] }) => {
+  return (t, p, d) => {
+    setHandlerMeta(t, p, {
+      checkAuth: true,
+      roles: opts.roles
+    });
   };
 };

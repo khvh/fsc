@@ -3,7 +3,7 @@ import Knex from 'knex';
 import { Model } from 'objection';
 import readdirp from 'readdirp';
 import Container, { Service } from 'typedi';
-import { Context } from './controller';
+import { Context, register } from './controller';
 
 export interface DB {}
 
@@ -56,7 +56,16 @@ export class Application {
   }
 
   async load(str) {
-    (await readdirp.promise(str, { fileFilter: '*.*s' })).forEach((controller) => require(controller.fullPath));
+    // const controllers = Object.values(
+    //   (await readdirp.promise(str, { fileFilter: '*.*s' })).map((controller) => require(controller.fullPath))
+    // );
+
+    register(
+      this.server,
+      (await readdirp.promise(str, { fileFilter: '*.*s' }))
+        .map((controller) => Object.values(require(controller.fullPath)))
+        .flat()
+    );
 
     return this;
   }

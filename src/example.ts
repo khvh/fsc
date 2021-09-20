@@ -1,10 +1,12 @@
 import crypto from 'crypto';
+import fastify from 'fastify';
 import { join } from 'path';
 import qs from 'qs';
 import 'reflect-metadata';
 import Container from 'typedi';
 import config from '../knexfile';
-import { Context } from './decorators/controller';
+import { MetadataController } from './controller/metadata.controller';
+import { Context, register } from './decorators/controller';
 import { Application } from './decorators/server';
 
 let i = 0;
@@ -20,7 +22,7 @@ const getMessageSignature = (path, request, secret, nonce) => {
   return hmac_digest;
 };
 
-(async () => {
+const r = async () => {
   (
     await Container.get(Application).init({
       port: 1338,
@@ -38,4 +40,16 @@ const getMessageSignature = (path, request, secret, nonce) => {
       dbConfig: config
     })
   ).start();
-})();
+};
+
+r();
+
+const run = async () => {
+  const app = fastify({ logger: true });
+
+  register(app, [MetadataController]);
+
+  app.listen(1338, () => {});
+};
+
+// run();
