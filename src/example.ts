@@ -1,5 +1,6 @@
 import Knex from 'knex';
 import { Model } from 'objection';
+import { join } from 'path';
 import 'reflect-metadata';
 import Container from 'typedi';
 import dbConfig from '../knexfile';
@@ -25,7 +26,7 @@ class V implements AuthUtils<{ first: string; email: string }> {
 
 Container.set('auth:utils', V);
 
-new Server()
+new Server(join(__dirname, 'controller'))
   .load(
     new Promise<any>(async (r) => {
       const knex = Knex(dbConfig);

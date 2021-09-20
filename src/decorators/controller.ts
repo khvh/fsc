@@ -31,10 +31,18 @@ export const register = (server: FastifyInstance, controllers: any[]) => {
     const Controller = Container.get(c);
     const meta = getMeta(Controller);
 
+    if (process.env.FSC_DEBUG) {
+      console.log(Controller, meta);
+    }
+
     Object.keys(meta.routes)
       .map((k) => meta.routes[k])
       .forEach(({ path, method, func, options = {}, checkAuth, roles = [] }) => {
         const url = ((meta.prefix || '') + path.replace(/\/$/, '')).replace('//', '/');
+
+        if (process.env.FSC_DEBUG) {
+          console.log(url);
+        }
 
         server.route({
           ...options,
