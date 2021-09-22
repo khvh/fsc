@@ -7,6 +7,8 @@ import { UnauthorizedError } from '../error/unauthorized.error';
 import { AuthUtils, Context } from './entities';
 import { getMeta } from './meta';
 
+export const AUTH_UTILS_CONTAINER = 'authUtils';
+
 export interface ControllerDescription {
   title?: string;
   description?: string;
@@ -21,7 +23,7 @@ export function Controller(prefix: string, description?: ControllerDescription) 
 }
 
 export const register = (server: FastifyInstance, controllers: any[]) => {
-  const validator = Container.get('auth:utils') as AuthUtils;
+  const validator = Container.get(AUTH_UTILS_CONTAINER) as AuthUtils;
 
   controllers.forEach((c) => {
     if (!Container.get(c)) {
@@ -70,9 +72,9 @@ export const register = (server: FastifyInstance, controllers: any[]) => {
               }
             }
 
-            if (validator.currentUser) {
-              ctx.currentUser = await validator.currentUser(ctx);
-            }
+            ctx.currentUser = await validator.currentUser(ctx);
+            // if (validator.currentUser) {
+            // }
 
             if (roles.length > 0) {
               const userRoles = await validator.getUserRoles(ctx);

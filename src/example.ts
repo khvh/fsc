@@ -2,11 +2,12 @@ import Knex from 'knex';
 import { Model } from 'objection';
 import { join } from 'path';
 import 'reflect-metadata';
-import Container from 'typedi';
+import Container, { Service } from 'typedi';
 import dbConfig from '../knexfile';
 import { AuthUtils, Context } from './decorators/entities';
 import { Server } from './decorators/server';
 
+@Service('authUtils')
 class V implements AuthUtils<{ first: string; email: string }> {
   verifyUserToken(ctx: Context): Promise<boolean> {
     return Promise.resolve(true);
@@ -26,7 +27,9 @@ class V implements AuthUtils<{ first: string; email: string }> {
 
 Container.set('auth:utils', V);
 
-new Server(join(__dirname, 'controller'))
+console.log((Container.get('auth:utils') as any).currentUser);
+
+new Server(join(__dirname, 'controller'), 3772)
   .load(
     new Promise<any>(async (r) => {
       const knex = Knex(dbConfig);

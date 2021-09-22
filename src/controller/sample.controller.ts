@@ -1,6 +1,8 @@
 import { FastifyRequest } from 'fastify';
 import { Inject, Service } from 'typedi';
-import { Context, Controller } from '../decorators/controller';
+import { Authorize } from '..';
+import { Controller } from '../decorators/controller';
+import { Context } from '../decorators/entities';
 import { Get, Post } from '../decorators/handler';
 import { Member } from '../entities/test.entity';
 import { TestService } from '../services/test.service';
@@ -12,9 +14,10 @@ export class SampleController {
 
   // @Authorized({ roles: ['admin'] })
   @Get('/')
-  async someMethod(rep, res) {
+  @Authorize()
+  async someMethod({ currentUser }: Context) {
     const s = await this.s.testMembers();
-    return { s };
+    return { s, currentUser };
   }
 
   @Post('/kek')
