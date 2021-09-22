@@ -61,7 +61,7 @@ export const register = (server: FastifyInstance, controllers: any[]) => {
             };
 
             if (checkAuth) {
-              const authorized = await (Container.get('validators') as AuthUtils).verifyUserToken(ctx);
+              const authorized = await validator.verifyUserToken(ctx);
 
               if (!authorized) {
                 res.status(401);
