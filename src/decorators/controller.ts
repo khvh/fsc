@@ -103,7 +103,7 @@ const registerController = (server: FastifyInstance, Controller: any, validator:
   return { prefix, routePaths };
 };
 
-export const register = (server: FastifyInstance, controllers: Function[]) => {
+export const register = (server: FastifyInstance, controllers: any[]) => {
   const routes = new Map<string, string[]>();
   const validator = Container.get(AUTH_UTILS_CONTAINER) as AuthUtils;
 
