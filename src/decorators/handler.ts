@@ -8,18 +8,6 @@ export interface HandlerDescription {
   description?: string;
 }
 
-const handler = (path = '', method: HttpMethod) => {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    (target['methods'] = target['methods'] || {})[propertyKey] = {
-      path,
-      method,
-      func: descriptor.value
-    };
-
-    return descriptor;
-  };
-};
-
 export const Handle = (path: string, method: HttpMethod = HttpMethod.Get, options?: RouteOptions) => {
   return function (t, p, d) {
     setHandlerMeta(t, p, {

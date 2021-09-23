@@ -10,15 +10,19 @@
     "dev": "cross-env NODE_OPTIONS=--enable-source-maps cross-env CONFIG=./config.yml nodemon",
     "start": "ts-node src/index.ts",
     "build": "rollup -c",
+    "test": "ava",
+    "test:watch": "ava --watch -v",
     "patchpub": "yarn build ; npm version patch ; npm publish"
   },
   "devDependencies": {
     "@types/knex": "^0.16.1",
     "@types/lodash": "^4.14.172",
     "@types/node": "^16.6.2",
+    "ava": "^3.15.0",
     "cross-env": "^7.0.3",
     "esbuild": "^0.12.22",
     "nodemon": "^2.0.12",
+    "pino-pretty": "^7.0.1",
     "prettier": "^2.3.2",
     "rollup": "^2.56.2",
     "rollup-plugin-dts": "^3.0.2",
@@ -57,5 +61,16 @@
     "printWidth": 120,
     "trailingComma": "none",
     "semi": true
+  },
+  "ava": {
+    "files": [
+      "src/test/**/*"
+    ],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   }
 }

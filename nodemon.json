@@ -2,6 +2,6 @@
   "watch": ["src"],
   "ignore": ["src/**/*.test.ts"],
   "ext": "ts,mjs,js,json,graphql",
-  "exec": "node -r ts-eager/register src/example.ts",
+  "exec": "node -r ts-eager/register src/example.ts  | pino-pretty",
   "legacyWatch": true
 }

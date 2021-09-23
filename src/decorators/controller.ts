@@ -1,7 +1,8 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { intersection } from 'lodash';
 import 'reflect-metadata';
 import Container from 'typedi';
+import { EmptyPathError } from '../error/empty-path.error';
 import { ForbiddenError } from '../error/forbidden.error';
 import { UnauthorizedError } from '../error/unauthorized.error';
 import { AuthUtils, Context } from './entities';
@@ -15,6 +16,10 @@ export interface ControllerDescription {
 }
 
 export function Controller(prefix: string, description?: ControllerDescription) {
+  if (prefix === null || prefix.trim() === '') {
+    throw new EmptyPathError();
+  }
+
   return (target) => {
     const meta = getMeta(target.prototype);
 
@@ -22,73 +27,89 @@ export function Controller(prefix: string, description?: ControllerDescription) 
   };
 }
 
-export const register = (server: FastifyInstance, controllers: any[]) => {
+const getRouteUrl = (prefix: string, path: string) => {
+  return ((prefix || '') + path.replace(/\/$/, '')).replace('//', '/');
+};
+
+const createContext = (req: FastifyRequest, res: FastifyReply) => ({
+  req,
+  res,
+  authorization: req.headers?.authorization?.replace('Bearer ', ''),
+  body: req.body,
+  query: req.query,
+  params: req.params,
+  headers: req.headers,
+  currentUser: null
+});
+
+const authorize = async (ctx: Context, res: FastifyReply) => {
+  const authorized = await (Container.get(AUTH_UTILS_CONTAINER) as AuthUtils).verifyUserToken(ctx);
+
+  if (!authorized) {
+    res.status(401);
+
+    throw new UnauthorizedError();
+  }
+};
+
+const authorizeRoles = async (roles, ctx: Context, res: FastifyReply) => {
+  const userRoles = await (Container.get(AUTH_UTILS_CONTAINER) as AuthUtils).getUserRoles(ctx);
+
+  if (intersection(userRoles, roles).length === 0) {
+    res.status(403);
+
+    throw new ForbiddenError();
+  }
+};
+
+const registerController = (server: FastifyInstance, Controller: any, validator: AuthUtils) => {
+  if (!Container.get(Controller)) {
+    Container.set(Controller);
+  }
+
+  Controller = Container.get(Controller);
+
+  const { prefix, routes } = getMeta(Controller);
+
+  const routePaths = Object.keys(routes)
+    .map((k) => routes[k])
+    .map(({ path, method, func, options = {}, checkAuth, roles = [] }) => {
+      server.route({
+        ...options,
+        method,
+        url: getRouteUrl(prefix, path),
+        handler: async (req, res) => {
+          const ctx = createContext(req, res);
+
+          if (checkAuth) {
+            authorize(ctx, res);
+          }
+
+          try {
+            ctx.currentUser = await validator.currentUser(ctx);
+          } catch (err) {}
+
+          if (roles.length > 0) {
+            authorizeRoles(roles, ctx, res);
+          }
+
+          return func.apply(Controller, [ctx]);
+        }
+      });
+
+      return path;
+    });
+
+  return { prefix, routePaths };
+};
+
+export const register = (server: FastifyInstance, controllers: Function[]) => {
+  const routes = new Map<string, string[]>();
   const validator = Container.get(AUTH_UTILS_CONTAINER) as AuthUtils;
 
-  controllers.forEach((c) => {
-    if (!Container.get(c)) {
-      Container.set(c);
-    }
+  controllers
+    .map((controller) => registerController(server, controller, validator))
+    .forEach(({ prefix, routePaths }) => routes.set(prefix, routePaths));
 
-    const Controller = Container.get(c);
-    const meta = getMeta(Controller);
-
-    if (process.env.FSC_DEBUG) {
-      console.log(Controller, meta);
-    }
-
-    Object.keys(meta.routes)
-      .map((k) => meta.routes[k])
-      .forEach(({ path, method, func, options = {}, checkAuth, roles = [] }) => {
-        const url = ((meta.prefix || '') + path.replace(/\/$/, '')).replace('//', '/');
-
-        if (process.env.FSC_DEBUG) {
-          console.log(url);
-        }
-
-        server.route({
-          ...options,
-          method,
-          url,
-          handler: async (req, res) => {
-            const ctx: Context = {
-              req,
-              res,
-              authorization: req.headers?.authorization?.replace('Bearer ', ''),
-              body: req.body,
-              query: req.query,
-              params: req.params,
-              headers: req.headers,
-              currentUser: null
-            };
-
-            if (checkAuth) {
-              const authorized = await validator.verifyUserToken(ctx);
-
-              if (!authorized) {
-                res.status(401);
-
-                throw new UnauthorizedError();
-              }
-            }
-
-            ctx.currentUser = await validator.currentUser(ctx);
-            // if (validator.currentUser) {
-            // }
-
-            if (roles.length > 0) {
-              const userRoles = await validator.getUserRoles(ctx);
-
-              if (intersection(userRoles, roles).length === 0) {
-                res.status(403);
-
-                throw new ForbiddenError();
-              }
-            }
-
-            return func.apply(Controller, [ctx]);
-          }
-        });
-      });
-  });
+  return routes;
 };
