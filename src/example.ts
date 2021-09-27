@@ -10,7 +10,7 @@ import { Server } from './decorators/server';
 @Service('authUtils')
 class V implements AuthUtils<{ first: string; email: string }> {
   verifyUserToken(ctx: Context): Promise<boolean> {
-    return Promise.resolve(true);
+    return Promise.resolve(ctx.authorization === 'TOKEN');
   }
 
   currentUser(ctx: Context) {
