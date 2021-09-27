@@ -1,4 +1,5 @@
-import fastify, { FastifyInstance } from 'fastify';
+import fastify, { FastifyInstance, FastifyPluginCallback, FastifyRegisterOptions } from 'fastify';
+import swagger, { SwaggerOptions } from 'fastify-swagger';
 import { join } from 'path';
 import readdirp from 'readdirp';
 import Container, { Service } from 'typedi';
@@ -14,19 +15,43 @@ export class Server {
     this.server = fastify({ logger: true });
   }
 
-  register(plugin, opts?) {
+  enableOpenAPI(options?: SwaggerOptions, routePrefix = '/_openapi') {
+    this.server.register(
+      swagger,
+      options
+        ? {
+            ...options,
+            routePrefix
+          }
+        : {
+            routePrefix: '/_openapi',
+            swagger: {
+              info: {
+                title: process.env.npm_package_name,
+                description: process.env?.npm_package_repository_url ?? '',
+                version: process.env.npm_package_version
+              }
+            },
+            exposeRoute: true
+          }
+    );
+
+    return this;
+  }
+
+  register<T = {}>(plugin: FastifyPluginCallback, opts?: FastifyRegisterOptions<T>) {
     this.server.register(plugin, opts);
 
     return this;
   }
 
-  load(fn: Promise<any>) {
-    this.loadables.push(fn);
-
+  load(fn: () => void) {
+    this.loadables.push(new Promise((resolve) => resolve(fn())));
     return this;
   }
 
   async run() {
+    console.log(this.loadables);
     await Promise.all(this.loadables);
 
     register(

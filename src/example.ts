@@ -2,7 +2,7 @@ import Knex from 'knex';
 import { Model } from 'objection';
 import { join } from 'path';
 import 'reflect-metadata';
-import Container, { Service } from 'typedi';
+import { Service } from 'typedi';
 import dbConfig from '../knexfile';
 import { AuthUtils, Context } from './decorators/entities';
 import { Server } from './decorators/server';
@@ -25,18 +25,7 @@ class V implements AuthUtils<{ first: string; email: string }> {
   }
 }
 
-Container.set('auth:utils', V);
-
-console.log((Container.get('auth:utils') as any).currentUser);
-
 new Server(join(__dirname, 'controller'), 3772)
-  .load(
-    new Promise<any>(async (r) => {
-      const knex = Knex(dbConfig);
-
-      Model.knex(knex);
-
-      r(true);
-    })
-  )
+  .enableOpenAPI()
+  .load(() => Model.knex(Knex(dbConfig)))
   .run();

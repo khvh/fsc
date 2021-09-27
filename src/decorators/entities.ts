@@ -13,7 +13,7 @@ export enum HttpMethod {
 export interface RouteMetadata {
   path: string;
   method: HttpMethod;
-  options?: RouteOptions;
+  options?: Partial<RouteOptions<any, any, any, any, any, any>>;
   checkAuth?: boolean;
   roles?: string[];
   func: (...args) => void;

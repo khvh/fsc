@@ -12,15 +12,20 @@ import { TestService } from '../services/test.service';
 export class SampleController {
   @Inject() s: TestService;
 
-  // @Authorized({ roles: ['admin'] })
-  @Get('/')
+  @Get('/', {
+    schema: {
+      description: 'This is an endpoint to test if DB is working'
+    }
+  })
   @Authorize()
   async someMethod({ currentUser }: Context) {
     const s = await this.s.testMembers();
+
     return { s, currentUser };
   }
 
   @Post('/kek')
+  @Authorize({ roles: ['admin'] })
   async postMethod(rep: FastifyRequest, res) {
     console.log(rep.body);
     return { status: 'ok' };

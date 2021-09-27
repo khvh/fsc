@@ -3,12 +3,11 @@ import 'reflect-metadata';
 import { HttpMethod } from './entities';
 import { setHandlerMeta } from './meta';
 
-export interface HandlerDescription {
-  title?: string;
-  description?: string;
-}
-
-export const Handle = (path: string, method: HttpMethod = HttpMethod.Get, options?: RouteOptions) => {
+export const Handle = (
+  path: string,
+  method: HttpMethod = HttpMethod.Get,
+  options?: Partial<RouteOptions<any, any, any, any, any, any>>
+) => {
   return function (t, p, d) {
     setHandlerMeta(t, p, {
       path,
@@ -19,23 +18,17 @@ export const Handle = (path: string, method: HttpMethod = HttpMethod.Get, option
   };
 };
 
-export const Get = (path = '', options?: RouteOptions, description?: HandlerDescription) =>
+export const Get = (path = '', options?: Partial<RouteOptions<any, any, any, any, any, any>>) =>
   Handle(path, HttpMethod.Get, options);
 
-export const Post = (path = '', options?: RouteOptions, description?: HandlerDescription) =>
-  Handle(path, HttpMethod.Post, options);
+export const Post = (path = '', options?: RouteOptions) => Handle(path, HttpMethod.Post, options);
 
-export const Put = (path = '', options?: RouteOptions, description?: HandlerDescription) =>
-  Handle(path, HttpMethod.Put, options);
+export const Put = (path = '', options?: RouteOptions) => Handle(path, HttpMethod.Put, options);
 
-export const Patch = (path = '', options?: RouteOptions, description?: HandlerDescription) =>
-  Handle(path, HttpMethod.Patch, options);
+export const Patch = (path = '', options?: RouteOptions) => Handle(path, HttpMethod.Patch, options);
 
-export const Delete = (path = '', options?: RouteOptions, description?: HandlerDescription) =>
-  Handle(path, HttpMethod.Delete, options);
+export const Delete = (path = '', options?: RouteOptions) => Handle(path, HttpMethod.Delete, options);
 
-export const Options = (path = '', options?: RouteOptions, description?: HandlerDescription) =>
-  Handle(path, HttpMethod.Options, options);
+export const Options = (path = '', options?: RouteOptions) => Handle(path, HttpMethod.Options, options);
 
-export const Head = (path = '', options?: RouteOptions, description?: HandlerDescription) =>
-  Handle(path, HttpMethod.Head, options);
+export const Head = (path = '', options?: RouteOptions) => Handle(path, HttpMethod.Head, options);
