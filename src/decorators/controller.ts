@@ -82,7 +82,11 @@ const registerController = (server: FastifyInstance, Controller: any, validator:
           const ctx = createContext(req, res);
 
           if (checkAuth) {
-            authorize(ctx, res);
+            try {
+              authorize(ctx, res);
+            } catch (err) {
+              return res.send(err);
+            }
           }
 
           try {
