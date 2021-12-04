@@ -5,21 +5,18 @@ import Container, { Service } from 'typedi';
 import { AuthUtils, Context } from './decorators/entities';
 import { Server } from './decorators/server';
 import { Client, CLIENT_INJECT_TOKEN } from './odm';
+import { OpenIDAuthService } from './services/auth.service';
 
 dotenv.config();
 
 @Service('authUtils')
 class V implements AuthUtils<{ first: string; email: string }> {
   verifyUserToken(ctx: Context): Promise<boolean> {
-    // return Promise.resolve(ctx.authorization === 'TOKEN');
-    return Promise.resolve(true);
+    return Container.get(OpenIDAuthService).verifyToken(ctx.authorization);
   }
 
   currentUser(ctx: Context) {
-    return Promise.resolve({
-      first: 'Test User',
-      email: 'user@eample.org'
-    });
+    return Container.get(OpenIDAuthService).decodeUser<{ first: string; email: string }>(ctx.authorization);
   }
 
   getUserRoles(ctx: Context) {
@@ -34,4 +31,14 @@ class V implements AuthUtils<{ first: string; email: string }> {
       Container.set(CLIENT_INJECT_TOKEN, await new Client(process.env.MONGO_URL, process.env.MONGO_DB).connect());
     })
     .run();
+
+  await Container.get(OpenIDAuthService)
+    .setConfig({
+      provider: process.env.OIDC,
+      clientId: process.env.OIDC_CLIENT,
+      clientSecret: process.env.OIDC_SECRET,
+      redirect: process.env.OIDC_REDIRECT
+    })
+    .fetchWellKnown();
+  await Container.get(OpenIDAuthService).fetchKeys();
 })();
