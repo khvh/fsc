@@ -1,16 +1,18 @@
-import Knex from 'knex';
-import { Model } from 'objection';
+import dotenv from 'dotenv';
 import { join } from 'path';
 import 'reflect-metadata';
-import { Service } from 'typedi';
-import dbConfig from '../knexfile';
+import Container, { Service } from 'typedi';
 import { AuthUtils, Context } from './decorators/entities';
 import { Server } from './decorators/server';
+import { Client, CLIENT_INJECT_TOKEN } from './odm';
+
+dotenv.config();
 
 @Service('authUtils')
 class V implements AuthUtils<{ first: string; email: string }> {
   verifyUserToken(ctx: Context): Promise<boolean> {
-    return Promise.resolve(ctx.authorization === 'TOKEN');
+    // return Promise.resolve(ctx.authorization === 'TOKEN');
+    return Promise.resolve(true);
   }
 
   currentUser(ctx: Context) {
@@ -25,7 +27,11 @@ class V implements AuthUtils<{ first: string; email: string }> {
   }
 }
 
-new Server(join(__dirname, 'controller'), 3772)
-  .enableOpenAPI()
-  .load(() => Model.knex(Knex(dbConfig)))
-  .run();
+(async () => {
+  await new Server(join(__dirname, 'controller'), 3772)
+    .enableOpenAPI()
+    .load(async () => {
+      Container.set(CLIENT_INJECT_TOKEN, await new Client(process.env.MONGO_URL, process.env.MONGO_DB).connect());
+    })
+    .run();
+})();

@@ -13,6 +13,12 @@ export class Server {
 
   constructor(private controllers: string = join(__dirname, 'controller'), private port: number = 7331) {
     this.server = fastify({ logger: true });
+
+    this.server.addSchema({
+      $id: 'http://localhost',
+      type: 'object',
+      name: 'test'
+    });
   }
 
   enableOpenAPI(options?: SwaggerOptions, routePrefix = '/_openapi') {
@@ -51,7 +57,6 @@ export class Server {
   }
 
   async run() {
-    console.log(this.loadables);
     await Promise.all(this.loadables);
 
     register(

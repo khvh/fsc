@@ -39,11 +39,13 @@
     "got": "^11.8.2",
     "knex": "^0.95.11",
     "lodash": "^4.17.21",
+    "mongodb": "^4.2.1",
     "objection": "^2.2.16",
     "pg": "^8.7.1",
     "qs": "^6.10.1",
     "readdirp": "^3.6.0",
     "reflect-metadata": "^0.1.13",
+    "ts-mixer": "^6.0.0",
     "typedi": "^0.10.0"
   },
   "peerDependencies": {

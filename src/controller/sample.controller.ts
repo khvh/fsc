@@ -4,13 +4,14 @@ import { Authorize } from '..';
 import { Controller } from '../decorators/controller';
 import { Context } from '../decorators/entities';
 import { Get, Post } from '../decorators/handler';
-import { Member } from '../entities/test.entity';
+import { MemberRepository } from '../entities/member.entity';
 import { TestService } from '../services/test.service';
 
 @Controller('/')
 @Service()
 export class SampleController {
   @Inject() s: TestService;
+  @Inject() memberRepository: MemberRepository;
 
   @Get('/', {
     schema: {
@@ -19,20 +20,33 @@ export class SampleController {
   })
   @Authorize()
   async someMethod({ currentUser }: Context) {
-    const s = await this.s.testMembers();
+    const members = await this.s.testMembers();
 
-    return { s, currentUser };
+    return members;
+  }
+
+  @Get('/:id')
+  async one(c: Context<any>) {
+    const m = await this.s.one(c.params.id);
+
+    return m;
+  }
+
+  @Get('/odm/testall')
+  async odmTest() {
+    const res = this.memberRepository.deleteById('61aba60b2816f66c3f84b857');
+
+    return res;
   }
 
   @Post('/kek')
   @Authorize({ roles: ['admin'] })
   async postMethod(rep: FastifyRequest, res) {
-    console.log(rep.body);
     return { status: 'ok' };
   }
 
   @Post('/interface/:id')
-  async test(c: Context<Member>) {
+  async test(c: Context<any>) {
     console.log('======================================');
     console.log(c.currentUser, c.body, c.params, c.query, c.authorization);
     console.log('======================================');

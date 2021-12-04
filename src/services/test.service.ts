@@ -1,13 +1,15 @@
-import { Service } from 'typedi';
-import { Member } from '../model/member.model';
+import { Inject, Service } from 'typedi';
+import { MemberRepository } from '../entities/member.entity';
 
 @Service()
 export class TestService {
-  test() {
-    return true;
+  @Inject() member: MemberRepository;
+
+  async one(id) {
+    return await this.member.findById(id);
   }
 
-  testMembers() {
-    return Member.query();
+  async testMembers() {
+    return await this.member.findAll();
   }
 }
