@@ -4,7 +4,7 @@ import { verify } from 'jsonwebtoken';
 import jwks from 'jwks-rsa';
 import { stringify } from 'qs';
 import { Service } from 'typedi';
-import { Authorize } from '..';
+import { Authorize } from '../decorators/authorized';
 
 export class OIDCResponse {
   @Expose({ name: 'access_token', toClassOnly: true })
