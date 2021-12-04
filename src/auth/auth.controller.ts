@@ -1,12 +1,12 @@
 import { stringify } from 'qs';
 import { Inject, Service } from 'typedi';
-import { Controller } from '../decorators/controller';
+import { Controller } from '..';
 import { Context } from '../decorators/entities';
 import { Get } from '../decorators/handler';
 import { OpenIDAuthService } from '../services/auth.service';
 
-@Controller('/_oidc')
 @Service()
+@Controller('_oidc')
 export class OpenIDAuthController {
   @Inject() authService: OpenIDAuthService;
 

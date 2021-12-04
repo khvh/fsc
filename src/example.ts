@@ -31,7 +31,6 @@ class V implements AuthUtils<{ first: string; email: string }> {
       Container.set(CLIENT_INJECT_TOKEN, await new Client(process.env.MONGO_URL, process.env.MONGO_DB).connect());
     })
     .run();
-
   await Container.get(OpenIDAuthService)
     .setConfig({
       provider: process.env.OIDC,
